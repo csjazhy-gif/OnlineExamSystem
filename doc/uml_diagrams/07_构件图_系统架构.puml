@@ -1,0 +1,141 @@
+@startuml 构件图_系统架构
+skinparam component {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+  ArrowColor #334155
+}
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #94A3B8
+}
+
+package "前端层 (Vue.js + Element UI)" {
+  [登录注册模块] as C_Login
+  [学生考试模块] as C_Exam
+  [学习中心模块] as C_Study
+  [教师管理模块] as C_Teacher
+  [管理员模块] as C_Admin
+  [数据可视化模块] as C_Charts
+}
+
+package "API网关层 (Nginx / Vite Proxy)" {
+  [HTTP代理\n/api → :9201] as C_Proxy
+}
+
+package "后端服务层 (Spring Boot)" {
+
+  package "控制器层 (Controller)" {
+    [LoginController\n用户认证] as Ctrl_Login
+    [ExamManageController\n考试管理] as Ctrl_Exam
+    [PaperController\n试卷管理] as Ctrl_Paper
+    [ScoreController\n成绩管理] as Ctrl_Score
+    [ScoringController\n阅卷系统] as Ctrl_Scoring
+    [StudyController\n学习中心] as Ctrl_Study
+    [AIQuestionController\nAI出题] as Ctrl_AI
+    [GeneticPaperController\n遗传算法组卷] as Ctrl_Genetic
+    [ViolationController\n违规监控] as Ctrl_Violation
+    [FaceRecognitionController\n人脸识别] as Ctrl_Face
+    [KMeansClusterController\n聚类分析] as Ctrl_KMeans
+    [AnnouncementController\n公告管理] as Ctrl_Announce
+  }
+
+  package "业务逻辑层 (Service)" {
+    [ExamManageService] as Svc_Exam
+    [PaperService] as Svc_Paper
+    [ScoreService] as Svc_Score
+    [StudyService] as Svc_Study
+    [AIQuestionService] as Svc_AI
+    [GeneticPaperService] as Svc_Genetic
+    [ViolationService] as Svc_Violation
+    [FaceRecognitionService] as Svc_Face
+    [KMeansClusterService] as Svc_KMeans
+  }
+
+  package "工具层 (Util)" {
+    [ScoreCalculator\n分数计算] as U_Calc
+    [SubjectiveGradingUtil\n主观题NLP评分] as U_Grade
+    [FillQuestionGrader\n填空题评分] as U_Fill
+    [SparkAIClient\n星火AI接口] as U_Spark
+    [CaptchaUtil\n验证码工具] as U_Captcha
+  }
+
+  package "数据访问层 (Mapper)" {
+    [ScoreMapper] as M_Score
+    [AnswerMapper] as M_Answer
+    [StudentMapper] as M_Student
+    [ExamManageMapper] as M_Exam
+    [PaperMapper] as M_Paper
+    [MultiQuestionMapper] as M_Multi
+    [FillQuestionMapper] as M_Fill
+    [JudgeQuestionMapper] as M_Judge
+    [SubjectiveQuestionMapper] as M_Sub
+    [WrongQuestionMapper] as M_Wrong
+    [StudyRecordMapper] as M_Study
+    [ViolationRecordMapper] as M_Viol
+  }
+}
+
+package "数据层" {
+  database "MySQL\nonline_exam_system" as DB
+}
+
+package "外部服务" {
+  cloud "讯飞星火API\n(AI大模型)" as Spark
+}
+
+' ── 前端 → 代理 ──
+C_Login --> C_Proxy
+C_Exam --> C_Proxy
+C_Study --> C_Proxy
+C_Teacher --> C_Proxy
+C_Admin --> C_Proxy
+C_Charts --> C_Proxy
+
+' ── 代理 → 控制器 ──
+C_Proxy --> Ctrl_Login
+C_Proxy --> Ctrl_Exam
+C_Proxy --> Ctrl_Paper
+C_Proxy --> Ctrl_Score
+C_Proxy --> Ctrl_Scoring
+C_Proxy --> Ctrl_Study
+C_Proxy --> Ctrl_AI
+C_Proxy --> Ctrl_Genetic
+C_Proxy --> Ctrl_Violation
+C_Proxy --> Ctrl_Face
+C_Proxy --> Ctrl_KMeans
+C_Proxy --> Ctrl_Announce
+
+' ── 控制器 → 服务 ──
+Ctrl_Exam --> Svc_Exam
+Ctrl_Paper --> Svc_Paper
+Ctrl_Score --> Svc_Score
+Ctrl_Study --> Svc_Study
+Ctrl_AI --> Svc_AI
+Ctrl_Genetic --> Svc_Genetic
+Ctrl_Violation --> Svc_Violation
+Ctrl_Face --> Svc_Face
+Ctrl_KMeans --> Svc_KMeans
+
+' ── 服务 → 工具 ──
+Ctrl_Scoring --> U_Grade
+Ctrl_Scoring --> U_Fill
+Ctrl_Study --> U_Calc
+Ctrl_AI --> U_Spark
+
+' ── 服务/Mapper → 数据库 ──
+M_Score --> DB
+M_Answer --> DB
+M_Student --> DB
+M_Exam --> DB
+M_Paper --> DB
+M_Multi --> DB
+M_Fill --> DB
+M_Judge --> DB
+M_Sub --> DB
+M_Wrong --> DB
+M_Study --> DB
+M_Viol --> DB
+
+' ── AI外部调用 ──
+U_Spark --> Spark
+@enduml

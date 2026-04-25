@@ -1,0 +1,91 @@
+@startuml 顺序图_考试交卷流程
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #3B82F6
+  ParticipantBackgroundColor #EEF5FF
+  ParticipantBorderColor #3B82F6
+}
+
+actor 学生
+participant "answer.vue\n(答题前端)" as FE
+participant "ScoreController\n(成绩控制器)" as SC
+participant "AnswerMapper\n(答案持久层)" as AM
+participant "ScoreMapper\n(成绩持久层)" as SM
+participant "WrongQuestionMapper\n(错题持久层)" as WM
+database "MySQL" as DB
+
+学生 -> FE : 点击交卷
+activate FE
+
+FE -> FE : 客观题自动判分\n(选择/填空/判断)
+note right of FE
+  objScore = 选择题得分
+        + 填空题得分
+        + 判断题得分
+end note
+
+FE -> FE : 统计 correctCount
+
+alt 含主观题
+  FE -> FE : etScore = -1\n(待教师批阅)
+else 纯客观题
+  FE -> FE : etScore = objScore
+end
+
+FE -> AM : POST /answer/add\n提交各题答案
+activate AM
+AM -> DB : INSERT answer
+AM --> FE : 保存成功
+deactivate AM
+
+FE -> SC : POST /score\n{ptScore, etScore, score}
+activate SC
+SC -> SM : add(Score)
+activate SM
+SM -> DB : INSERT score
+SM --> SC : 成功
+deactivate SM
+SC --> FE : 200 OK
+deactivate SC
+
+FE -> WM : POST /study/wrong/record\n记录错题
+activate WM
+WM -> DB : INSERT/UPDATE wrong_question
+WM --> FE : 成功
+deactivate WM
+
+FE -> FE : POST /study/record\n保存学习记录
+
+FE --> 学生 : 跳转交卷结果页\n(answerScore.vue)
+deactivate FE
+
+== 教师批阅阶段 (如有主观题) ==
+
+actor 教师
+participant "ScoringController\n(阅卷控制器)" as GC
+participant "SubjectiveAnswerMapper" as SAM
+
+教师 -> GC : POST /scoring/score\n{answerId, teacherScore}
+activate GC
+GC -> SAM : 更新主观题评分
+activate SAM
+SAM -> DB : UPDATE subjective_answer
+SAM --> GC : 更新成功
+deactivate SAM
+
+GC -> SM : 查询 ptScore
+activate SM
+SM --> GC : ptScore 值
+deactivate SM
+
+GC -> GC : finalScore = ptScore + 主观题总分
+
+GC -> SM : updateEtScore\n{etScore, score}
+activate SM
+SM -> DB : UPDATE score\nSET etScore=?, score=?
+SM --> GC : 更新成功
+deactivate SM
+
+GC --> 教师 : 批阅完成
+deactivate GC
+@enduml

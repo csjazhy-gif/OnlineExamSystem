@@ -1,0 +1,122 @@
+@startuml 用例图_在线考试系统
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+  ArrowColor #334155
+}
+skinparam actor {
+  BackgroundColor #3B82F6
+  BorderColor #1E40AF
+}
+
+actor "学生" as Student
+actor "教师" as Teacher
+actor "管理员" as Admin
+
+rectangle "在线考试系统" {
+
+  ' ============ 公共功能 ============
+  usecase "用户登录" as UC_Login
+  usecase "验证码校验" as UC_Captcha
+  usecase "人脸识别验证" as UC_Face
+  usecase "修改密码" as UC_ChangePwd
+  usecase "查看公告" as UC_ViewAnnouncement
+
+  ' ============ 学生功能 ============
+  usecase "参加正式考试" as UC_TakeExam
+  usecase "答题交卷" as UC_Submit
+  usecase "自动阅卷(客观题)" as UC_AutoGrade
+  usecase "查看成绩" as UC_ViewScore
+  usecase "查看考试历史" as UC_ExamHistory
+  usecase "模拟考试" as UC_MockExam
+  usecase "智能专项练习" as UC_SmartPractice
+  usecase "错题本" as UC_WrongBook
+  usecase "重做错题" as UC_Redo
+  usecase "学习曲线" as UC_StudyCurve
+  usecase "薄弱知识点分析" as UC_WeakPoints
+  usecase "个人中心" as UC_StudentCenter
+  usecase "消息通知" as UC_Message
+
+  ' ============ 教师功能 ============
+  usecase "管理题库" as UC_ManageQuestion
+  usecase "管理选择题" as UC_ManageMulti
+  usecase "管理填空题" as UC_ManageFill
+  usecase "管理判断题" as UC_ManageJudge
+  usecase "管理主观题" as UC_ManageSubjective
+  usecase "组卷管理" as UC_ManagePaper
+  usecase "遗传算法智能组卷" as UC_GeneticPaper
+  usecase "发布考试" as UC_PublishExam
+  usecase "批阅主观题" as UC_Scoring
+  usecase "系统自动阅卷" as UC_SysAutoGrade
+  usecase "管理学生" as UC_ManageStudent
+  usecase "查看所有成绩" as UC_AllGrades
+  usecase "学生画像分析" as UC_Profile
+  usecase "试卷质量分析" as UC_PaperQuality
+  usecase "发布公告" as UC_PubAnnouncement
+  usecase "违规记录查看" as UC_Violation
+  usecase "教师中心" as UC_TeacherCenter
+
+  ' ============ 管理员功能 ============
+  usecase "管理教师" as UC_ManageTeacher
+  usecase "AI智能出题" as UC_AIQuestion
+  usecase "系统设置" as UC_SysSettings
+  usecase "系统日志" as UC_SysLog
+
+  ' ─── 学生关联 ───
+  Student --> UC_Login
+  Student --> UC_TakeExam
+  Student --> UC_ViewScore
+  Student --> UC_ExamHistory
+  Student --> UC_MockExam
+  Student --> UC_SmartPractice
+  Student --> UC_WrongBook
+  Student --> UC_StudyCurve
+  Student --> UC_WeakPoints
+  Student --> UC_StudentCenter
+  Student --> UC_ViewAnnouncement
+  Student --> UC_Message
+  Student --> UC_ChangePwd
+
+  ' ─── 教师关联 ───
+  Teacher --> UC_Login
+  Teacher --> UC_ManageQuestion
+  Teacher --> UC_ManagePaper
+  Teacher --> UC_GeneticPaper
+  Teacher --> UC_PublishExam
+  Teacher --> UC_Scoring
+  Teacher --> UC_ManageStudent
+  Teacher --> UC_AllGrades
+  Teacher --> UC_Profile
+  Teacher --> UC_PaperQuality
+  Teacher --> UC_PubAnnouncement
+  Teacher --> UC_Violation
+  Teacher --> UC_TeacherCenter
+  Teacher --> UC_AIQuestion
+  Teacher --> UC_ChangePwd
+
+  ' ─── 管理员关联 ───
+  Admin --> UC_Login
+  Admin --> UC_ManageTeacher
+  Admin --> UC_AIQuestion
+  Admin --> UC_SysSettings
+  Admin --> UC_SysLog
+  Admin --> UC_ChangePwd
+
+  ' ─── include 关系 ───
+  UC_Login ..> UC_Captcha : <<include>>
+  UC_TakeExam ..> UC_Face : <<include>>
+  UC_TakeExam ..> UC_Submit : <<include>>
+  UC_Submit ..> UC_AutoGrade : <<include>>
+
+  ' ─── extend 关系 ───
+  UC_WrongBook <.. UC_Redo : <<extend>>
+  UC_Scoring <.. UC_SysAutoGrade : <<extend>>
+  UC_ManageQuestion <.. UC_ManageMulti : <<extend>>
+  UC_ManageQuestion <.. UC_ManageFill : <<extend>>
+  UC_ManageQuestion <.. UC_ManageJudge : <<extend>>
+  UC_ManageQuestion <.. UC_ManageSubjective : <<extend>>
+}
+@enduml

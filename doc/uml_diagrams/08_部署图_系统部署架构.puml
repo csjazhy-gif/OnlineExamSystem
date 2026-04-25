@@ -1,0 +1,65 @@
+@startuml 部署图_系统部署架构
+skinparam node {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+}
+skinparam artifact {
+  BackgroundColor #F0FDF4
+  BorderColor #22C55E
+}
+skinparam database {
+  BackgroundColor #FEF9C3
+  BorderColor #EAB308
+}
+
+node "客户端 (浏览器)" as Client {
+  artifact "Vue.js SPA\n(学生端/教师端/管理员端)" as VueApp
+  artifact "Element UI 组件库" as ElementUI
+  artifact "ECharts 数据可视化" as ECharts
+  artifact "Axios HTTP客户端" as Axios
+}
+
+node "Web服务器 (Nginx)" as WebServer {
+  artifact "静态资源 (dist/)" as Static
+  artifact "反向代理配置\n(/api → :9201)" as Proxy
+}
+
+node "应用服务器 (JVM)" as AppServer {
+  artifact "Spring Boot 2.x\n(端口 9201)" as SpringBoot {
+    artifact "Controller层\n(31个控制器)" as Controllers
+    artifact "Service层\n(26个服务)" as Services
+    artifact "Mapper层 (MyBatis)\n(23个数据映射)" as Mappers
+    artifact "Util工具层\n(分数计算/NLP评分/AI客户端)" as Utils
+  }
+  artifact "Interceptor\n(登录拦截器)" as Interceptor
+  artifact "GlobalExceptionHandler\n(全局异常处理)" as ExHandler
+}
+
+node "数据库服务器 (MySQL)" as DBServer {
+  database "online_exam_system" as DB {
+    artifact "student (学生表)" as T1
+    artifact "teacher (教师表)" as T2
+    artifact "admin (管理员表)" as T3
+    artifact "exam_manage (考试表)" as T4
+    artifact "paper_manage (试卷表)" as T5
+    artifact "multi_question (选择题)" as T6
+    artifact "fill_question (填空题)" as T7
+    artifact "judge_question (判断题)" as T8
+    artifact "subjective_question (主观题)" as T9
+    artifact "score (成绩表)" as T10
+    artifact "subjective_answer (主观答案)" as T11
+    artifact "wrong_question (错题表)" as T12
+    artifact "study_record (学习记录)" as T13
+    artifact "violation_record (违规记录)" as T14
+    artifact "announcement (公告表)" as T15
+    artifact "system_log (系统日志)" as T16
+  }
+}
+
+cloud "讯飞星火API\n(大语言模型)" as SparkCloud
+
+Client --> WebServer : HTTPS
+WebServer --> AppServer : HTTP :9201
+AppServer --> DBServer : JDBC :3306
+AppServer --> SparkCloud : WebSocket/HTTPS\n(AI出题 & 自动评分)
+@enduml

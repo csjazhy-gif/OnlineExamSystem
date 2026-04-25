@@ -1,0 +1,18 @@
+2026-04-25 11:16:21.366 [restartedMain] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field kMeansClusterService in com.rabbiter.oes.controller.KMeansClusterController required a bean of type 'com.rabbiter.oes.service.KMeansClusterService' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'com.rabbiter.oes.service.KMeansClusterService' in your configuration.
+

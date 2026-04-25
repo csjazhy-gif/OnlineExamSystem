@@ -1,0 +1,51 @@
+@startuml 协作图_系统模块交互
+skinparam object {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+}
+skinparam arrow {
+  Color #334155
+}
+
+object "Vue前端\n(学生/教师/管理员)" as FE
+object "LoginController\n用户认证" as Login
+object "ExamManageController\n考试管理" as Exam
+object "PaperController\n试卷管理" as Paper
+object "ScoreController\n成绩管理" as Score
+object "ScoringController\n阅卷系统" as Scoring
+object "StudyController\n学习中心" as Study
+object "AIQuestionController\nAI出题" as AI
+object "GeneticPaperController\n智能组卷" as Genetic
+object "ViolationController\n违规监控" as Violation
+object "AnnouncementController\n公告管理" as Announce
+object "FaceRecognitionController\n人脸识别" as Face
+object "KMeansClusterController\n学生画像" as KMeans
+object "MySQL数据库" as DB
+
+FE --> Login : 1.登录认证
+FE --> Exam : 2.查询/发布考试
+FE --> Paper : 3.组卷/查询试卷
+FE --> Score : 4.提交/查询成绩
+FE --> Scoring : 5.批阅主观题
+FE --> Study : 6.模拟考试/练习/错题
+FE --> AI : 7.AI智能出题
+FE --> Genetic : 8.遗传算法组卷
+FE --> Violation : 9.违规记录上报
+FE --> Announce : 10.公告CRUD
+FE --> Face : 11.人脸识别验证
+FE --> KMeans : 12.聚类分析
+
+Login --> DB : 1.1 查询用户表
+Exam --> Paper : 2.1 关联试卷
+Paper --> DB : 3.1 查询题库
+Score --> DB : 4.1 读写成绩表
+Scoring --> Score : 5.1 更新最终成绩
+Study --> DB : 6.1 读写学习记录
+Study --> Score : 6.2 保存模拟成绩
+AI --> DB : 7.1 保存生成题目
+Genetic --> Paper : 8.1 生成试卷
+Genetic --> DB : 8.2 读取题库
+Violation --> DB : 9.1 保存违规记录
+KMeans --> Score : 12.1 读取成绩数据
+KMeans --> Study : 12.2 读取学习数据
+@enduml

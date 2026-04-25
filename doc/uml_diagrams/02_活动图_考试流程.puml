@@ -1,0 +1,98 @@
+@startuml 活动图_考试流程
+skinparam activity {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+  ArrowColor #334155
+}
+skinparam swimlane {
+  BorderColor #3B82F6
+}
+
+|学生|
+start
+:登录系统;
+:输入账号密码;
+:验证码校验;
+if (登录成功?) then (是)
+  :进入学生首页;
+else (否)
+  :提示错误信息;
+  stop
+endif
+
+:选择考试;
+
+if (需要人脸识别?) then (是)
+  :人脸识别验证;
+  if (验证通过?) then (是)
+  else (否)
+    :提示验证失败;
+    stop
+  endif
+else (否)
+endif
+
+if (考试时间窗口内?) then (是)
+  :进入答题页面;
+else (否)
+  :提示不在考试时间;
+  stop
+endif
+
+:开始倒计时;
+
+repeat
+  :作答题目;
+  note right
+    选择题 → 选择 ABCD
+    填空题 → 输入答案
+    判断题 → 选择对/错
+    主观题 → 文本作答
+  end note
+  :切换下一题;
+repeat while (还有未答题目?) is (是)
+
+if (主动交卷 / 时间到?) then (交卷)
+  :提交答案;
+else (继续)
+  :继续作答;
+  stop
+endif
+
+|系统|
+:客观题自动阅卷;
+note right
+  选择题: 比对正确答案
+  填空题: 多答案匹配
+  判断题: T/F 比对
+end note
+:计算客观题得分(ptScore);
+:保存成绩记录;
+:记录错题到错题本;
+
+if (含主观题?) then (是)
+  :etScore 设为 -1 (待批阅);
+  |教师|
+  :查看待批阅试卷;
+  :逐题评分主观题;
+  if (使用系统自动阅卷?) then (是)
+    :NLP关键词+相似度评分;
+  else (否)
+    :教师手动打分;
+  endif
+  :计算最终成绩;
+  note right
+    etScore = ptScore + 主观题得分
+  end note
+  :更新 etScore 和 score;
+else (否)
+  :etScore = ptScore;
+  :成绩即时生效;
+endif
+
+|学生|
+:查看最终成绩;
+:查看答题详情;
+
+stop
+@enduml

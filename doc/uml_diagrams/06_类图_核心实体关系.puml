@@ -1,0 +1,242 @@
+@startuml 类图_核心实体关系
+skinparam class {
+  BackgroundColor #EEF5FF
+  BorderColor #3B82F6
+  ArrowColor #334155
+  HeaderBackgroundColor #3B82F6
+  HeaderFontColor #FFFFFF
+}
+
+package "用户模块" {
+  class Student {
+    - studentId : Integer
+    - studentName : String
+    - grade : String
+    - major : String
+    - clazz : String
+    - institute : String
+    - tel : String
+    - email : String
+    - pwd : String
+    - cardId : String
+    - sex : String
+    - role : String
+    - faceData : String
+  }
+
+  class Teacher {
+    - teacherId : Integer
+    - teacherName : String
+    - institute : String
+    - sex : String
+    - tel : String
+    - email : String
+    - pwd : String
+    - cardId : String
+    - type : String
+    - role : String
+  }
+
+  class Admin {
+    - adminId : Integer
+    - adminName : String
+    - sex : String
+    - tel : String
+    - email : String
+    - pwd : String
+    - cardId : String
+    - role : String
+  }
+
+  class Login {
+    - username : Integer
+    - password : String
+    - role : Integer
+  }
+}
+
+package "考试模块" {
+  class ExamManage {
+    - examCode : Integer
+    - description : String
+    - source : String
+    - paperId : Integer
+    - examDate : String
+    - totalTime : Integer
+    - totalScore : Integer
+    - type : String
+    - examStartTime : String
+    - examEndTime : String
+    - multiScore : Integer
+    - fillScore : Integer
+    - judgeScore : Integer
+    - subjectiveScore : Integer
+  }
+
+  class PaperManage {
+    - paperId : Integer
+    - questionType : Integer
+    - questionId : Integer
+  }
+
+  class Score {
+    - scoreId : Integer
+    - examCode : Integer
+    - studentId : Integer
+    - subject : String
+    - ptScore : Integer
+    - etScore : Integer
+    - score : Integer
+    - answerDate : String
+  }
+}
+
+package "题库模块" {
+  class MultiQuestion {
+    - questionId : Integer
+    - subject : String
+    - section : String
+    - question : String
+    - answerA : String
+    - answerB : String
+    - answerC : String
+    - answerD : String
+    - rightAnswer : String
+    - level : String
+    - score : Integer
+    - analysis : String
+    - source : String
+  }
+
+  class FillQuestion {
+    - questionId : Integer
+    - subject : String
+    - question : String
+    - answer : String
+    - score : Integer
+    - level : String
+    - section : String
+    - analysis : String
+    - source : String
+  }
+
+  class JudgeQuestion {
+    - questionId : Integer
+    - subject : String
+    - question : String
+    - answer : String
+    - level : String
+    - section : String
+    - score : Integer
+    - analysis : String
+    - source : String
+  }
+
+  class SubjectiveQuestion {
+    - questionId : Integer
+    - subject : String
+    - question : String
+    - referenceAnswer : String
+    - score : Integer
+    - section : String
+    - level : String
+    - analysis : String
+    - source : String
+    - createTime : Date
+  }
+}
+
+package "答题与阅卷模块" {
+  class SubjectiveAnswer {
+    - answerId : Integer
+    - questionId : Integer
+    - examCode : Integer
+    - studentId : Integer
+    - studentAnswer : String
+    - teacherScore : Integer
+    - teacherComment : String
+    - scoredBy : Integer
+    - scoredTime : Date
+    - submitTime : Date
+    - status : Integer
+  }
+
+  class ViolationRecord {
+    - id : Integer
+    - examCode : Integer
+    - studentId : Integer
+    - violationType : String
+    - description : String
+    - violationTime : String
+    - clientIp : String
+  }
+}
+
+package "学习中心模块" {
+  class WrongQuestion {
+    - id : Integer
+    - studentId : Integer
+    - questionType : Integer
+    - questionId : Integer
+    - wrongCount : Integer
+    - lastWrongTime : Date
+    - mastered : Integer
+    - questionContent : String
+    - correctAnswer : String
+    - wrongAnswer : String
+    - score : Integer
+    - subject : String
+    - analysis : String
+  }
+
+  class StudyRecord {
+    - id : Integer
+    - studentId : Integer
+    - practiceDate : Date
+    - practiceType : Integer
+    - totalQuestions : Integer
+    - correctCount : Integer
+    - wrongCount : Integer
+    - score : Integer
+    - totalScore : Integer
+    - accuracy : Double
+    - duration : Integer
+    - subject : String
+    - examCode : Integer
+  }
+
+  class Announcement {
+    - id : Integer
+    - title : String
+    - content : String
+    - publisherId : Integer
+    - publisherName : String
+    - publisherRole : String
+    - targetRole : String
+    - createTime : Date
+    - status : Integer
+  }
+}
+
+' ── 关系 ──
+Student "1" -- "*" Score : 参加考试 >
+Student "1" -- "*" WrongQuestion : 错题记录 >
+Student "1" -- "*" StudyRecord : 学习记录 >
+Student "1" -- "*" SubjectiveAnswer : 提交答案 >
+Student "1" -- "*" ViolationRecord : 违规记录 >
+
+Teacher "1" -- "*" SubjectiveAnswer : 批阅 >
+Teacher "1" -- "*" Announcement : 发布公告 >
+Teacher "1" -- "*" ExamManage : 管理考试 >
+
+ExamManage "1" -- "1" PaperManage : 关联试卷 >
+ExamManage "1" -- "*" Score : 包含成绩 >
+ExamManage "1" -- "*" ViolationRecord : 违规记录 >
+
+PaperManage "*" -- "1" MultiQuestion : 选择题
+PaperManage "*" -- "1" FillQuestion : 填空题
+PaperManage "*" -- "1" JudgeQuestion : 判断题
+PaperManage "*" -- "1" SubjectiveQuestion : 主观题
+
+SubjectiveQuestion "1" -- "*" SubjectiveAnswer : 对应答案 >
+@enduml
